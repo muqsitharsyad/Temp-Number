@@ -7,7 +7,7 @@ const {
   BROWSER_HEADERS,
 } = require("./utils");
 
-const TIMEOUT = 15000;
+const TIMEOUT = 30000;
 
 async function fetchHTML(url, referer) {
   const headers = { ...BROWSER_HEADERS };
