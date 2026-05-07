@@ -75,7 +75,7 @@ const refreshBtn = $('#refreshBtn');
 let state = { numbers: [], current: null, refreshTimer: null };
 
 async function loadProviders() {
-  const r = await fetch('/api/providers').then(r => r.json());
+  const r = await fetch('_sms/providers').then(r => r.json());
   r.forEach(p => {
     const o = document.createElement('option');
     o.value = p.id; o.textContent = p.name;
@@ -88,7 +88,7 @@ async function loadNumbers() {
   numbersListEl.innerHTML = '';
   try {
     const provider = providerFilterEl.value;
-    const url = '/api/numbers' + (provider ? '?provider=' + provider : '');
+    const url = '_sms/numbers' + (provider ? '?provider=' + provider : '');
     const data = await fetch(url).then(r => r.json());
     state.numbers = data.numbers || [];
     populateCountryFilter();
@@ -122,7 +122,7 @@ async function showDiagnostics() {
     '<div class="font-semibold text-yellow-300">🔍 Mendiagnosis koneksi ke source…</div>' +
     '</div>';
   try {
-    const dbg = await fetch('/api/debug').then(r => r.json());
+    const dbg = await fetch('_sms/debug').then(r => r.json());
     const rows = Object.entries(dbg).map(([url, v]) => {
       const short = url.replace('https://', '').split('/')[0];
       if (v.error) {
@@ -220,7 +220,7 @@ async function loadInbox() {
   if (!state.current) return;
   const n = state.current;
   try {
-    const url = '/api/messages?provider=' + encodeURIComponent(n.provider) +
+    const url = '_sms/messages?provider=' + encodeURIComponent(n.provider) +
                 '&number=' + encodeURIComponent(n.number) +
                 (n.url ? '&url=' + encodeURIComponent(n.url) : '');
     const data = await fetch(url).then(r => r.json());

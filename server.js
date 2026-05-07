@@ -12,12 +12,12 @@ app.get("/", (_req, res) => {
 });
 
 // List provider yang tersedia
-app.get("/api/providers", (req, res) => {
+app.get("/_sms/providers", (req, res) => {
   res.json(Object.entries(PROVIDERS).map(([id, p]) => ({ id, name: p.name })));
 });
 
 // Daftar nomor (gabungan semua / per provider)
-app.get("/api/numbers", async (req, res) => {
+app.get("/_sms/numbers", async (req, res) => {
   const wanted = req.query.provider;
   const ids = wanted && PROVIDERS[wanted] ? [wanted] : Object.keys(PROVIDERS);
   const results = await Promise.allSettled(
@@ -54,7 +54,7 @@ app.get("/api/numbers", async (req, res) => {
 });
 
 // Inbox SMS
-app.get("/api/messages", async (req, res) => {
+app.get("/_sms/messages", async (req, res) => {
   const { provider, number, url } = req.query;
   if (!provider || !number || !PROVIDERS[provider]) {
     return res.status(400).json({ error: "provider & number required" });
@@ -71,7 +71,7 @@ app.get("/api/messages", async (req, res) => {
 });
 
 // Debug endpoint: raw scrape test
-app.get("/api/debug", async (req, res) => {
+app.get("/_sms/debug", async (req, res) => {
   const axios = require("axios");
   const result = {};
   const testUrls = [
@@ -97,7 +97,7 @@ app.get("/api/debug", async (req, res) => {
 });
 
 // Health check tiap source
-app.get("/api/health", async (req, res) => {
+app.get("/_sms/health", async (req, res) => {
   const ids = Object.keys(PROVIDERS);
   const out = {};
   await Promise.all(
