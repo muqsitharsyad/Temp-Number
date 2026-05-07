@@ -58,10 +58,9 @@ const INDEX_HTML = `<!DOCTYPE html>
     </main>
   </div>
 </div>
-<script src="/app.js"></script>
-</body>
-</html>`;
+<script>`;
 
+// APP_JS will be injected inline — no separate /app.js request needed
 const APP_JS = `
 const $ = (s) => document.querySelector(s);
 const numbersListEl = $('#numbersList');
@@ -266,4 +265,10 @@ refreshBtn.addEventListener('click', () => { loadNumbers(); if (state.current) l
 })();
 `;
 
-module.exports = { INDEX_HTML, APP_JS };
+// Build final HTML with APP_JS inlined — avoids separate /app.js request that nginx may block
+const INDEX_HTML_FINAL = INDEX_HTML + APP_JS + `
+</script>
+</body>
+</html>`;
+
+module.exports = { INDEX_HTML: INDEX_HTML_FINAL, APP_JS };

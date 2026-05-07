@@ -10,9 +10,6 @@ const PORT = process.env.PORT || 3000;
 app.get("/", (_req, res) => {
   res.type("html").send(INDEX_HTML);
 });
-app.get("/app.js", (_req, res) => {
-  res.type("application/javascript").send(APP_JS);
-});
 
 // List provider yang tersedia
 app.get("/api/providers", (req, res) => {
