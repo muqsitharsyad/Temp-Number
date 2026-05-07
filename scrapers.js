@@ -7,17 +7,36 @@ const {
   BROWSER_HEADERS,
 } = require("./utils");
 
-const TIMEOUT = 30000;
+const TIMEOUT = 20000;
 
 async function fetchHTML(url, referer) {
   const headers = { ...BROWSER_HEADERS };
   if (referer) headers.Referer = referer;
-  const res = await axios.get(url, {
+
+  const opts = {
     headers,
     timeout: TIMEOUT,
     maxRedirects: 5,
     validateStatus: (s) => s >= 200 && s < 400,
-  });
+  };
+
+  // Support HTTP/HTTPS proxy via env (useful when server IP is blocked by Cloudflare)
+  // Set HTTPS_PROXY=http://user:pass@host:port in docker-compose environment
+  if (process.env.HTTPS_PROXY || process.env.https_proxy) {
+    const proxyUrl = process.env.HTTPS_PROXY || process.env.https_proxy;
+    try {
+      const { URL } = require('url');
+      const p = new URL(proxyUrl);
+      opts.proxy = {
+        protocol: p.protocol.replace(':', ''),
+        host: p.hostname,
+        port: parseInt(p.port),
+        ...(p.username ? { auth: { username: p.username, password: p.password } } : {}),
+      };
+    } catch (_) {}
+  }
+
+  const res = await axios.get(url, opts);
   return res.data;
 }
 

@@ -94,8 +94,17 @@ async function loadNumbers() {
     state.numbers = data.numbers || [];
     populateCountryFilter();
     renderNumbers();
-    const errs = data.errors && data.errors.length ? ' (' + data.errors.length + ' source error)' : '';
-    statusEl.textContent = data.count + ' nomor ditemukan' + errs;
+    if (data.errors && data.errors.length) {
+      const errHtml = data.errors.map(e =>
+        '<div class="text-[11px] text-red-400">⚠ ' + e.provider + ': ' + e.error + '</div>'
+      ).join('');
+      const countText = data.count > 0
+        ? '<span class="text-emerald-400">' + data.count + ' nomor ditemukan</span>'
+        : '<span class="text-red-400">0 nomor — semua source gagal</span>';
+      statusEl.innerHTML = countText + '<br>' + errHtml;
+    } else {
+      statusEl.textContent = data.count + ' nomor ditemukan';
+    }
   } catch (e) {
     statusEl.textContent = 'Gagal memuat: ' + e.message;
   }

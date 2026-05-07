@@ -41,10 +41,9 @@ app.get("/api/numbers", async (req, res) => {
         }),
       );
     } else {
-      errors.push({
-        provider: id,
-        error: String((r.reason && r.reason.message) || r.reason),
-      });
+      const errMsg = String((r.reason && r.reason.message) || r.reason);
+      console.error(`[${id}] scrape FAILED:`, errMsg);
+      errors.push({ provider: id, error: errMsg });
     }
   });
   // dedupe by number, keep first

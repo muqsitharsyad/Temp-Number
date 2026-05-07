@@ -8,6 +8,8 @@ services:
     environment:
       - PORT=9000
       - NODE_ENV=production
+      # Jika IP server diblokir Cloudflare, set proxy HTTP/HTTPS residential:
+      # - HTTPS_PROXY=http://user:pass@proxyhost:port
     dns:
       - 8.8.8.8
       - 1.1.1.1
