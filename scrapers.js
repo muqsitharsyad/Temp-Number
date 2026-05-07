@@ -13,6 +13,10 @@ async function fetchHTML(url, referer) {
   const headers = { ...BROWSER_HEADERS };
   if (referer) headers.Referer = referer;
 
+async function fetchHTML(url, referer) {
+  const headers = { ...BROWSER_HEADERS };
+  if (referer) headers.Referer = referer;
+
   const opts = {
     headers,
     timeout: TIMEOUT,
@@ -36,8 +40,16 @@ async function fetchHTML(url, referer) {
     } catch (_) {}
   }
 
-  const res = await axios.get(url, opts);
-  return res.data;
+  console.log(`[fetch] GET ${url}`);
+  const t = Date.now();
+  try {
+    const res = await axios.get(url, opts);
+    console.log(`[fetch] ${res.status} ${url} (${Date.now() - t}ms, ${String(res.data).length} bytes)`);
+    return res.data;
+  } catch (err) {
+    console.error(`[fetch] FAIL ${url} (${Date.now() - t}ms):`, err.message);
+    throw err;
+  }
 }
 
 // Map nama negara -> ISO code (untuk source yang pakai title="Canada" dst.)

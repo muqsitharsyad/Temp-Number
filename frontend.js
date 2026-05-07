@@ -22,7 +22,7 @@ const INDEX_HTML = `<!DOCTYPE html>
     <div class="text-2xl">📨</div>
     <div class="flex-1">
       <h1 class="text-lg font-semibold">Temp Number</h1>
-      <p class="text-xs text-slate-400">Free public SMS receiver — multi-source aggregator</p>
+      <p class="text-xs text-slate-400">Free public SMS receiver — multi-source aggregator ⚡</p>
     </div>
     <button id="refreshBtn" class="px-3 py-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-sm font-medium">↻ Refresh</button>
   </header>
@@ -94,19 +94,60 @@ async function loadNumbers() {
     state.numbers = data.numbers || [];
     populateCountryFilter();
     renderNumbers();
+
     if (data.errors && data.errors.length) {
-      const errHtml = data.errors.map(e =>
-        '<div class="text-[11px] text-red-400">⚠ ' + e.provider + ': ' + e.error + '</div>'
+      const errItems = data.errors.map(e =>
+        '<div class="text-[11px] text-red-400 truncate" title="' + escapeHTML(e.error) + '">⚠ <b>' + e.provider + '</b>: ' + escapeHTML(e.error) + '</div>'
       ).join('');
       const countText = data.count > 0
         ? '<span class="text-emerald-400">' + data.count + ' nomor ditemukan</span>'
         : '<span class="text-red-400">0 nomor — semua source gagal</span>';
-      statusEl.innerHTML = countText + '<br>' + errHtml;
+      statusEl.innerHTML = countText + errItems;
     } else {
       statusEl.textContent = data.count + ' nomor ditemukan';
     }
+
+    // Jika tidak ada nomor sama sekali, tampilkan diagnostics
+    if (state.numbers.length === 0) {
+      showDiagnostics();
+    }
   } catch (e) {
     statusEl.textContent = 'Gagal memuat: ' + e.message;
+    showDiagnostics();
+  }
+}
+
+async function showDiagnostics() {
+  numbersListEl.innerHTML =
+    '<div class="p-3 rounded border border-yellow-700 bg-yellow-900/20 text-xs space-y-1">' +
+    '<div class="font-semibold text-yellow-300">🔍 Mendiagnosis koneksi ke source…</div>' +
+    '</div>';
+  try {
+    const dbg = await fetch('/api/debug').then(r => r.json());
+    const rows = Object.entries(dbg).map(([url, v]) => {
+      const short = url.replace('https://', '').split('/')[0];
+      if (v.error) {
+        return '<tr><td class="pr-2 text-slate-300 truncate max-w-[120px]" title="' + url + '">' + short + '</td>' +
+               '<td class="text-red-400">✗ ERROR</td>' +
+               '<td class="text-red-300 text-[10px] max-w-[160px] truncate" title="' + escapeHTML(v.error) + '">' + escapeHTML(v.error) + '</td></tr>';
+      }
+      const ok = v.status === 200;
+      return '<tr><td class="pr-2 text-slate-300 truncate max-w-[120px]" title="' + url + '">' + short + '</td>' +
+             '<td class="' + (ok ? 'text-emerald-400' : 'text-red-400') + '">' + (ok ? '✓ ' : '✗ ') + v.status + '</td>' +
+             '<td class="text-slate-400 text-[10px]">' + v.bytes + 'B · ' + v.ms + 'ms</td></tr>';
+    }).join('');
+    numbersListEl.innerHTML =
+      '<div class="p-3 rounded border border-yellow-700 bg-yellow-900/20 text-xs space-y-2">' +
+        '<div class="font-semibold text-yellow-300">⚠ Tidak ada nomor tersedia — Hasil diagnosa:</div>' +
+        '<table class="w-full border-collapse">' + rows + '</table>' +
+        '<div class="text-slate-400 pt-1">Jika status <b class="text-red-400">403</b>: IP server diblokir Cloudflare.<br>' +
+        'Jika <b class="text-red-400">ERROR / ETIMEDOUT</b>: masalah network/DNS.<br>' +
+        'Coba set <code class="bg-slate-800 px-1 rounded">HTTPS_PROXY</code> di docker-compose.</div>' +
+      '</div>';
+  } catch (e) {
+    numbersListEl.innerHTML =
+      '<div class="p-3 rounded border border-red-800 bg-red-900/20 text-xs text-red-300">' +
+      '⚠ Gagal diagnosa: ' + escapeHTML(e.message) + '</div>';
   }
 }
 

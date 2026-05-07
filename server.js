@@ -73,6 +73,32 @@ app.get("/api/messages", async (req, res) => {
   }
 });
 
+// Debug endpoint: raw scrape test
+app.get("/api/debug", async (req, res) => {
+  const axios = require("axios");
+  const result = {};
+  const testUrls = [
+    "https://www.receivesmsonline.net/",
+    "https://sms-online.co/receive-free-sms",
+    "https://www.freephonenum.com/us",
+  ];
+  await Promise.all(testUrls.map(async (url) => {
+    const t = Date.now();
+    try {
+      const r = await axios.get(url, {
+        timeout: 15000,
+        maxRedirects: 5,
+        validateStatus: () => true,
+        headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124 Safari/537.36" },
+      });
+      result[url] = { status: r.status, bytes: String(r.data).length, ms: Date.now() - t };
+    } catch (e) {
+      result[url] = { error: e.message, ms: Date.now() - t };
+    }
+  }));
+  res.json(result);
+});
+
 // Health check tiap source
 app.get("/api/health", async (req, res) => {
   const ids = Object.keys(PROVIDERS);
