@@ -13,10 +13,6 @@ async function fetchHTML(url, referer) {
   const headers = { ...BROWSER_HEADERS };
   if (referer) headers.Referer = referer;
 
-async function fetchHTML(url, referer) {
-  const headers = { ...BROWSER_HEADERS };
-  if (referer) headers.Referer = referer;
-
   const opts = {
     headers,
     timeout: TIMEOUT,
