@@ -5,6 +5,7 @@ Aplikasi web super-ringan untuk mendapatkan **nomor temporary** dan **menerima S
 > ⚠️ **Peringatan keras**: nomor yang ditampilkan adalah nomor PUBLIK — siapa saja bisa melihat SMS yang masuk. **Jangan** dipakai untuk verifikasi akun penting (bank, e-wallet, email utama). Cocok untuk: trial signup, testing, akun sekali-pakai.
 
 ## Fitur
+
 - 🌍 Multi-source: `receive-smss.com`, `receive-sms-free.cc`, `sms24.me` (resilient — kalau 1 down, lainnya jalan).
 - 🔍 Filter berdasarkan sumber, negara, dan keyword.
 - 📥 Inbox auto-refresh tiap 10 detik.
@@ -27,27 +28,51 @@ Buka [http://localhost:3000](http://localhost:3000).
 
 ## Endpoint API
 
-| Endpoint | Deskripsi |
-|----------|-----------|
-| `GET /api/providers` | Daftar source aktif |
-| `GET /api/numbers` | Semua nomor (gabungan) |
-| `GET /api/numbers?provider=sms24` | Nomor dari satu source |
-| `GET /api/messages?provider=...&number=...` | Inbox SMS untuk nomor |
-| `GET /api/health` | Status tiap source |
+| Endpoint                                    | Deskripsi              |
+| ------------------------------------------- | ---------------------- |
+| `GET /api/providers`                        | Daftar source aktif    |
+| `GET /api/numbers`                          | Semua nomor (gabungan) |
+| `GET /api/numbers?provider=sms24`           | Nomor dari satu source |
+| `GET /api/messages?provider=...&number=...` | Inbox SMS untuk nomor  |
+| `GET /api/health`                           | Status tiap source     |
 
 ## Deploy
 
-### Render (rekomendasi — gratis)
+### Docker (lokal atau cloud)
+
+**Build & jalankan**:
+```bash
+# Build image
+docker build -t temp-number:latest .
+
+# Run container (port 9000)
+docker run -p 9000:9000 temp-number:latest
+```
+
+**Atau pakai docker-compose**:
+```bash
+docker-compose up -d
+# Akses: http://localhost:9000
+```
+
+**Deploy ke cloud (e.g. DigitalOcean, AWS, Azure)**:
+- Push image ke Docker Hub / registry pribadi
+- Deploy container dengan port 9000
+
+### Render (rekomendasi — gratis, tanpa Docker)
+
 1. Push repo ini ke GitHub.
 2. Di [render.com](https://render.com): New → Web Service → connect repo.
 3. Build command: `npm install` · Start command: `npm start`.
-4. Selesai.
+4. Set `PORT` env var ke 3000 (atau biarkan default). Selesai.
 
 ### Railway / Fly.io
+
 Sama saja — auto-detect Node.js. Pastikan port pakai `process.env.PORT`.
 
 ### Vercel
-Bisa juga, tapi cocokkan jadi serverless function. Untuk kesederhanaan, prefer Render/Railway.
+
+Bisa juga, tapi cocokkan jadi serverless function. Untuk kesederhanaan, prefer Render/Railway/Docker.
 
 ## Catatan teknis
 
@@ -70,4 +95,5 @@ Bisa juga, tapi cocokkan jadi serverless function. Untuk kesederhanaan, prefer R
 ```
 
 ## Lisensi
+
 MIT — gunakan dengan bertanggung jawab.
