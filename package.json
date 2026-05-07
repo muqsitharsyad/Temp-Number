@@ -1,0 +1,19 @@
+{
+  "name": "temp-telp-number",
+  "version": "1.0.0",
+  "description": "Aplikasi web ringan untuk menerima SMS/OTP via nomor temporary publik dari berbagai sumber gratis.",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "cheerio": "^1.0.0",
+    "express": "^4.21.1"
+  }
+}
